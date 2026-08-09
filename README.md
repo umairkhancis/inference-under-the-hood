@@ -26,9 +26,8 @@ And protect those sensitive weights during quantization process while aggressive
 
 `quantization.py` compresses Qwen3-0.6B from `BF16` format to `W4A16` format using GPTQ via `llm-compressor`, taking the weights from 1.41 GB to 524 MB (about 64% smaller).
 
+<img width="1165" height="323" alt="Screenshot 2026-08-09 at 8 13 28 AM" src="https://github.com/user-attachments/assets/3baac170-7dad-4876-a0a2-a0f3c58a3a0f" /> 
 <img width="1166" height="420" alt="Screenshot 2026-08-09 at 9 09 53 AM" src="https://github.com/user-attachments/assets/ef00e045-bf38-4d59-b9e0-ade3d8faadef" />
-
-<img width="1165" height="323" alt="Screenshot 2026-08-09 at 8 13 28 AM" src="https://github.com/user-attachments/assets/3baac170-7dad-4876-a0a2-a0f3c58a3a0f" />
 
 
 Stay tuned!
