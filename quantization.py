@@ -1,0 +1,49 @@
+import warnings
+warnings.filterwarnings("ignore")
+
+import os, gc, math, pathlib
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+from llmcompressor.modifiers.quantization import GPTQModifier
+from llmcompressor import oneshot
+
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+
+## Step: 1: Define the model and output directories
+
+MODEL_DIR = "models/Qwen3-0.6B"
+OUTPUT_DIR = "models/Qwen3-0.6B-W4A16"
+
+print(f"Base model:      {MODEL_DIR}")
+print(f"Quantized model: {OUTPUT_DIR}")
+
+## Step 2: Define the quantization recipe
+
+recipe = GPTQModifier(
+    scheme="W4A16",
+    targets="Linear",
+    ignore=["lm_head"],
+)
+
+print(f"Recipe: {recipe}")
+
+## Step 3: Run the quantization process
+
+if not os.path.isdir(OUTPUT_DIR):
+    oneshot(
+        model="Qwen/Qwen3-0.6B",
+        dataset="wikitext",
+        dataset_config_name="wikitext-2-raw-v1",
+        recipe=recipe,
+        output_dir=OUTPUT_DIR,
+        max_seq_length=4096,
+        num_calibration_samples=256,
+        # torch 2.12's pin_memory() is broken when MPS is the accelerator, and the
+        # activation cache pins every CPU-offloaded tensor. Offload to MPS instead;
+        # on unified memory this costs nothing.
+        sequential_offload_device=(
+            "mps" if torch.backends.mps.is_available() else "cpu"
+        ),
+    )
+    print(f"Quantization complete. Model saved to: {OUTPUT_DIR}")
