@@ -11,18 +11,20 @@ mps_compat.install()
 from llmcompressor.modifiers.quantization import GPTQModifier
 from llmcompressor import oneshot
 
+from llms_module import BASE_MODEL_ID, MODEL_DIR, OUTPUT_DIR
 from utils import folder_size, format_size
 
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
-## Step: 1: Define the model and output directories
-
-MODEL_DIR = "~/.cache/huggingface/hub/models--Qwen--Qwen3-0.6B/snapshots"
-OUTPUT_DIR = "models/Qwen3-0.6B-W4A16"
-
 
 def quantize():
+    if not is_required():
+        print(f"Quantized model already exists at {OUTPUT_DIR}. Skipping quantization.")
+        return
+    
     """Quantize the base model to W4A16 and report the size reduction."""
+
+    ## Step 1: Report the model and output directories
 
     print(f"\n{'=' * 20} Quantization {'=' * 20}\n")
     print(f"Base model:      {MODEL_DIR}")
@@ -40,9 +42,9 @@ def quantize():
 
     ## Step 3: Run the quantization process
 
-    if not os.path.isdir(OUTPUT_DIR):
+    if is_required():
         oneshot(
-            model="Qwen/Qwen3-0.6B",
+            model=BASE_MODEL_ID,
             dataset="wikitext",
             dataset_config_name="wikitext-2-raw-v1",
             recipe=recipe,
@@ -66,3 +68,9 @@ def quantize():
     print(f"Original (BF16):    {format_size(size_orig)}")
     print(f"Quantized (W4A16):  {format_size(size_q)}")
     print(f"Reduction:          {reduction:.0f}%\n")
+
+
+def is_required():
+    """Return True if the quantized model is missing and needs to be generated."""
+
+    return not os.path.isdir(OUTPUT_DIR)
