@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-import os, gc, math
+import os, gc, math, pathlib
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -17,9 +17,10 @@ os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 ## Step: 1: Define the model and output directories
 
-MODEL_DIR = "models/Qwen3-0.6B"
+MODEL_DIR = "~/.cache/huggingface/hub/models--Qwen--Qwen3-0.6B/snapshots"
 OUTPUT_DIR = "models/Qwen3-0.6B-W4A16"
 
+print(f"\n{'=' * 20} Quantization {'=' * 20}\n")
 print(f"Base model:      {MODEL_DIR}")
 print(f"Quantized model: {OUTPUT_DIR}")
 
@@ -31,7 +32,7 @@ recipe = GPTQModifier(
     ignore=["lm_head"],
 )
 
-print(f"Recipe: {recipe}")
+# print(f"Recipe: {recipe}")
 
 ## Step 3: Run the quantization process
 
@@ -57,8 +58,7 @@ size_orig = folder_size(MODEL_DIR)
 size_q = folder_size(OUTPUT_DIR)
 reduction = (1 - size_q / size_orig) * 100 if size_orig > 0 else 0
 
-print("Model Size Comparison")
-print("=" * 45)
+print(f"\n{'=' * 20} Quantization Impact {'=' * 20}\n")
 print(f"Original (BF16):    {format_size(size_orig)}")
 print(f"Quantized (W4A16):  {format_size(size_q)}")
-print(f"Reduction:          {reduction:.0f}%")
+print(f"Reduction:          {reduction:.0f}%\n")

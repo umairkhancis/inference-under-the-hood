@@ -1,7 +1,7 @@
 import pathlib
 
 def folder_size(path):
-    p = pathlib.Path(path)
+    p = pathlib.Path(path).expanduser()
     if not p.exists():
         return 0
     return sum(f.stat().st_size for f in p.rglob("*") if f.is_file())
