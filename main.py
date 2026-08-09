@@ -1,6 +1,6 @@
-from llms_module import BASE_MODEL_ID, OUTPUT_DIR
+from llms_module import BASE_MODEL_ID, OUTPUT_DIR, load_model
 from quantization_module import quantize
-from inference_module import infer, load_model
+from inference_module import infer
 
 if __name__ == "__main__":
     
