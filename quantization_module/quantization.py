@@ -19,7 +19,8 @@ os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 def quantize():
     if not is_required():
-        print(f"Quantized model already exists at {OUTPUT_DIR}. Skipping quantization.")
+        print(f"Quantized model already exists at {OUTPUT_DIR}.")
+        print(f"Skipping quantization step.\n")
         return
     
     """Quantize the base model to W4A16 and report the size reduction."""

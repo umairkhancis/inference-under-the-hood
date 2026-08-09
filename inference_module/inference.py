@@ -22,3 +22,4 @@ def infer(model, tokenizer):
 
     print(f"\nPrompt: {PROMPT}")
     print(f"\nResponse: {tokenizer.decode(generated, skip_special_tokens=True)}\n")
+
