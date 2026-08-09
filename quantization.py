@@ -1,12 +1,17 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-import os, gc, math, pathlib
+import os, gc, math
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+import mps_compat
+mps_compat.install()
+
 from llmcompressor.modifiers.quantization import GPTQModifier
 from llmcompressor import oneshot
+
+from utils import folder_size, format_size
 
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
@@ -47,3 +52,13 @@ if not os.path.isdir(OUTPUT_DIR):
         ),
     )
     print(f"Quantization complete. Model saved to: {OUTPUT_DIR}")
+
+size_orig = folder_size(MODEL_DIR)
+size_q = folder_size(OUTPUT_DIR)
+reduction = (1 - size_q / size_orig) * 100 if size_orig > 0 else 0
+
+print("Model Size Comparison")
+print("=" * 45)
+print(f"Original (BF16):    {format_size(size_orig)}")
+print(f"Quantized (W4A16):  {format_size(size_q)}")
+print(f"Reduction:          {reduction:.0f}%")
