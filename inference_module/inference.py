@@ -79,25 +79,58 @@ def get_vllm_metrics(inference_server_url):
 
     return metrics
 
+def debug_metrics(inference_server_url):
+    metrics_of_interest = [
+        "vllm:time_to_first_token_seconds_sum", 
+        "vllm:time_to_first_token_seconds_count", 
+        "vllm:inter_token_latency_seconds_sum", 
+        "vllm:inter_token_latency_seconds_count",
+        "vllm:e2e_request_latency_seconds_sum", 
+        "vllm:e2e_request_latency_seconds_count",
+        "vllm:generation_tokens_total",
+        "vllm:prompt_tokens_total"
+    ]
+    
+    metrics = get_vllm_metrics(inference_server_url)
+    
+    print("vLLM Metrics:\n")
+    for key in metrics_of_interest:
+        if key in metrics:
+            print(f"  {key.replace('vllm:', '')}: {metrics[key]:g}")
+
+def demo_inference_performance(inference_server_url, prompt, resp):
+    metrics = get_vllm_metrics(inference_server_url)
+    ttft = metrics.get("vllm:time_to_first_token_seconds_sum", 0) / max(1, metrics.get("vllm:time_to_first_token_seconds_count", 1))
+    itl = metrics.get("vllm:inter_token_latency_seconds_sum", 0) / max(1, metrics.get("vllm:inter_token_latency_seconds_count", 1))
+    tl = metrics.get("vllm:e2e_request_latency_seconds_sum", 0) / max(1, metrics.get("vllm:e2e_request_latency_seconds_count", 1))
+    decode_throughput = metrics.get("vllm:generation_tokens_total", 0) / max(1, metrics.get("vllm:e2e_request_latency_seconds_sum", 1))
+    prefill_throughput = metrics.get("vllm:prompt_tokens_total", 0) / max(1, metrics.get("vllm:e2e_request_latency_seconds_sum", 1))
+    sys_throughput = (metrics.get("vllm:prompt_tokens_total", 0) + metrics.get("vllm:generation_tokens_total", 0)) / max(1, metrics.get("vllm:e2e_request_latency_seconds_sum", 1))
+    
+    print(f"\nPrompt: {prompt}\n")
+    print(f"Response: {resp.choices[0].message.content}\n")
+    print(f"Usage: {resp.usage.prompt_tokens} prompt + "
+          f"{resp.usage.completion_tokens} completion = {resp.usage.total_tokens} total\n")
+    print(f"Inference SLIs:\n")
+    print(f"- Average Time To First Token (TTFT): {ttft:.2f}s")
+    print(f"- Average Inter Token Latency (ITL): {itl:.2f}s")
+    print(f"- Average Total Latency (TL): {tl:.2f}s")
+    print(f"- Generation Throughput (Decode Phase): {decode_throughput:.2f} tokens/s")
+    print(f"- Prompt Ingestion Throughput (Prefill Phase): {prefill_throughput:.2f} tokens/s")
+    print(f"- System Throughput (Prefill + Decode Phases): {sys_throughput:.2f} tokens/s\n")
 
 
 _ask = partial(vllm_infer, max_tokens=50, temperature=0.7, top_p=0.8, top_logprobs=5)
 
 def continuous_batching_demo(model, inference_server_url):
-    prompts = [
-        "What is Quantization?",
-        "How is KV Cache?",
-        "What is Continuous Batching?",
-        "Why use Prefix Caching?",
-        "What is PagedAttention?",
-    ]
+    # Generate 50 concurrent requests instead of 5
+    prompts = ["What is Continuous Batching? Explain in detail."] * 512
     
     before = get_vllm_metrics(inference_server_url)
     print(f"Sending {len(prompts)} concurrent requests...\n")
     start = time.time()
 
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=len(prompts)) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(prompts)//2) as pool:
         futures = {pool.submit(_ask, prompt=p, model=model, inference_server_url=inference_server_url): p for p in prompts}
         time.sleep(0.5)
         during = get_vllm_metrics(inference_server_url)
