@@ -17,3 +17,4 @@ vllm @ https://github.com/vllm-project/vllm/releases/download/v0.24.0/vllm-0.24.
 gradio
 aiohttp
 requests
+openai
