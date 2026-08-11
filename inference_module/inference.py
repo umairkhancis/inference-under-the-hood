@@ -122,33 +122,46 @@ def demo_inference_performance(inference_server_url, prompt, resp):
 
 _ask = partial(vllm_infer, max_tokens=50, temperature=0.7, top_p=0.8, top_logprobs=5)
 
+MAX_CONCURRENT_REQUESTS = 50
+
 def continuous_batching_demo(model, inference_server_url):
-    # Generate 50 concurrent requests instead of 5
-    prompts = ["What is Continuous Batching? Explain in detail."] * 512
+    concurrent_batches = [
+        ["What is Quantization?"] * MAX_CONCURRENT_REQUESTS,
+        ["How is KV Cache?"] * MAX_CONCURRENT_REQUESTS,
+        ["What is Continuous Batching?"] * MAX_CONCURRENT_REQUESTS,
+    ]
     
-    before = get_vllm_metrics(inference_server_url)
-    print(f"Sending {len(prompts)} concurrent requests...\n")
-    start = time.time()
+    print(f"\n{'=' * 20} Continuous Batching Demonstration {'=' * 20}\n")
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=len(prompts)//2) as pool:
-        futures = {pool.submit(_ask, prompt=p, model=model, inference_server_url=inference_server_url): p for p in prompts}
-        time.sleep(0.5)
-        during = get_vllm_metrics(inference_server_url)
-        running = during.get("vllm:num_requests_running", "--")
-        waiting = during.get("vllm:num_requests_waiting", "--")
-        print(f"  [mid-flight]  running: {running}  |  waiting: {waiting}")
+    for batch_num, batch in enumerate(concurrent_batches, start=1):
+        prompts = batch
+        
+        before = get_vllm_metrics(inference_server_url)
+        print(f"\nBatch #{batch_num}: Issuing burst of {len(prompts)} concurrent requests...\n")
+        start = time.time()
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(prompts)) as pool:
+            futures = { pool.submit(_ask, prompt=p, model=model, inference_server_url=inference_server_url): p for p in prompts }
+            
+            iter = 0
+            while not all(f.done() for f in futures):
+                iter += 1
+                during_metrics = get_vllm_metrics(inference_server_url)
+                
+                running = during_metrics.get("vllm:num_requests_running", "--")
+                waiting = during_metrics.get("vllm:num_requests_waiting", "--")
+                
+                status = f"{iter}.  ⏳ [vLLM STATE] Running: {running} | Waiting: {waiting}"
+                print(status)
 
-        for f in concurrent.futures.as_completed(futures):
-            resp = f.result()
-            print(f"  done: \"{futures[f][:40]}\" -> {resp.usage.completion_tokens} tokens")
+                time.sleep(2)
+            
+        elapsed = time.time() - start
+        after = get_vllm_metrics(inference_server_url)
+        tokens = after.get("vllm:generation_tokens_total", 0) - before.get("vllm:generation_tokens_total", 0)
 
-    elapsed = time.time() - start
-    after = get_vllm_metrics(inference_server_url)
-    tokens = after.get("vllm:generation_tokens_total", 0) - before.get("vllm:generation_tokens_total", 0)
-
-    print(f"\nAll {len(prompts)} completed in {elapsed:.2f}s")
-    if tokens > 0:
-        print(f"Tokens generated: {tokens:g}  |  ~{tokens / elapsed:.1f} tokens/s")
+        print(f"\n✅ Completed {len(prompts)} requests | {elapsed:.2f}s | ~{tokens / elapsed:.1f} tokens/s")
+        print("")
 
 
 def prefix_caching_demo(model, inference_server_url):
