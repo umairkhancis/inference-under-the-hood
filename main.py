@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
 
     """ Step 1: Run inference on the vLLM server. """
-    prompt = "What is PagedAttention in one sentence?"
+    prompt = "What is PagedAttention?"
     
     start = time.time()
     resp = vllm_infer(model, inference_server_url, prompt)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     
 
     """ Step 2: Run inference on the vLLM server and print token-by-token probabilities. """
-    prompt = "The capital of France is"
+    prompt = "The capital of UAE is"
     
     start = time.time()
     resp = vllm_infer(model, inference_server_url, prompt, temperature=0.7, max_tokens=15, top_p=0.8, top_logprobs=5)

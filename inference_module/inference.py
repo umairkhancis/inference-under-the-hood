@@ -85,10 +85,10 @@ _ask = partial(vllm_infer, max_tokens=50, temperature=0.7, top_p=0.8, top_logpro
 
 def continuous_batching_demo(model, inference_server_url):
     prompts = [
-        "What is quantization?",
-        "Explain KV caching briefly.",
-        "What is continuous batching?",
-        "Why is LLM inference memory-bound?",
+        "What is Quantization?",
+        "How is KV Cache?",
+        "What is Continuous Batching?",
+        "Why use Prefix Caching?",
         "What is PagedAttention?",
     ]
     
@@ -111,8 +111,7 @@ def continuous_batching_demo(model, inference_server_url):
 
     elapsed = time.time() - start
     after = get_vllm_metrics(inference_server_url)
-    tokens = after.get("vllm:generation_tokens_total", 0) - before.get(
-        "vllm:generation_tokens_total", 0)
+    tokens = after.get("vllm:generation_tokens_total", 0) - before.get("vllm:generation_tokens_total", 0)
 
     print(f"\nAll {len(prompts)} completed in {elapsed:.2f}s")
     if tokens > 0:
@@ -123,18 +122,15 @@ def prefix_caching_demo(model, inference_server_url):
     client = OpenAI(base_url=f"{inference_server_url}/v1", api_key="unused")
     
     SYSTEM_PROMPT = (
-        "You are a helpful AI teaching assistant for a course on "
-        "LLM optimization. You specialize in explaining concepts like "
-        "quantization, inference optimization, and model serving. Keep "
-        "answers concise -- one or two sentences."
+        "You are a helpful assistant that answers questions about vLLM, a high-performance inference engine for LLMs. "
     )
 
     questions = [
-        "What is weight quantization?",
-        "How does vLLM handle memory?",
-        "What is continuous batching?",
-        "Why use prefix caching?",
-        "What is GPTQ?",
+        "What is Quantization?",
+        "How is KV Cache?",
+        "What is Continuous Batching?",
+        "Why use Prefix Caching?",
+        "What is PagedAttention?",
     ]
 
     before = get_vllm_metrics(inference_server_url)
@@ -167,12 +163,17 @@ def prefix_caching_demo(model, inference_server_url):
 
     print(f"\nPrefix cache queries: {prefix_before:g} -> {prefix_after:g}  (+{prefix_after - prefix_before:g})")
 
-    cache_keys = [k for k in after if "prefix" in k.lower() 
-                or "cache_hit" in k.lower()]
+    cache_keys = [k for k in after if "prefix" in k.lower() or "cache_hit" in k.lower()]
+    
+    hits = 0
     for k in sorted(cache_keys):
         b, a = before.get(k, 0), after.get(k, 0)
         if a != b and k != "vllm:prefix_cache_queries_total":
+            hits = a
             print(f"  {k}: {b:g} -> {a:g}")
+    
+    hit_rate = (hits / prefix_after * 100) if prefix_after > 0 else 0.0
+    print(f"\nPrefix cache hit rate: {hit_rate:.1f}%")
 
     print("\n The increasing prefix_cache_queries count confirms vLLM is ")
     print("checking and reusing cached KV blocks for the shared system prompt.")
