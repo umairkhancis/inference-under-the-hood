@@ -165,14 +165,16 @@ def prefix_caching_demo(model, inference_server_url):
 
     cache_keys = [k for k in after if "prefix" in k.lower() or "cache_hit" in k.lower()]
     
-    hits = 0
     for k in sorted(cache_keys):
         b, a = before.get(k, 0), after.get(k, 0)
         if a != b and k != "vllm:prefix_cache_queries_total":
-            hits = a
             print(f"  {k}: {b:g} -> {a:g}")
     
-    hit_rate = (hits / prefix_after * 100) if prefix_after > 0 else 0.0
+        
+    hits_before = before.get("vllm:prefix_cache_hits_total", 0)
+    hits_after = after.get("vllm:prefix_cache_hits_total", 0)
+    hit_rate = (hits_after / prefix_after * 100) if prefix_after > 0 else 0.0
+    
     print(f"\nPrefix cache hit rate: {hit_rate:.1f}%")
 
     print("\n The increasing prefix_cache_queries count confirms vLLM is ")
