@@ -88,7 +88,8 @@ def debug_metrics(inference_server_url):
         "vllm:e2e_request_latency_seconds_sum", 
         "vllm:e2e_request_latency_seconds_count",
         "vllm:generation_tokens_total",
-        "vllm:prompt_tokens_total"
+        "vllm:prompt_tokens_total",
+        "vllm:prefix_cache_queries_total"
     ]
     
     metrics = get_vllm_metrics(inference_server_url)
@@ -168,7 +169,76 @@ def prefix_caching_demo(model, inference_server_url):
     client = OpenAI(base_url=f"{inference_server_url}/v1", api_key="unused")
     
     SYSTEM_PROMPT = (
-        "You are a helpful assistant that answers questions about vLLM, a high-performance inference engine for LLMs. "
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
+        "You are a helpful AI teaching assistant for "
+        "LLM optimization. You specialize in explaining concepts like vLLM, KV Cache, Continuous Batching, PagedAttention, Quantization, and Prefix Caching. "
+        "Provide clear and concise explanations, and keep your answers focused on the topic. "
+        "Encourage the user to ask follow-up questions for deeper understanding."
+        "Explain concepts in a way that is accessible to both beginners and those with some experience in machine learning."
     )
 
     questions = [
@@ -178,12 +248,18 @@ def prefix_caching_demo(model, inference_server_url):
         "Why use Prefix Caching?",
         "What is PagedAttention?",
     ]
+    
+    prefix_caching_enabled = False
+    if (prefix_caching_enabled):
+        print(f"\n{'=' * 20} Prefix Caching (Enabled) Demonstration {'=' * 20}\n")
+    else:
+        print(f"\n{'=' * 20} Prefix Caching (Disabled) Demonstration {'=' * 20}\n")
 
     before = get_vllm_metrics(inference_server_url)
     timings = []
     tok_counts = []
 
-    print("Sending 5 requests with the SAME system prompt...\n")
+    print(f"Sending 5 requests with the SAME prefix i.e SYSTEM PROMPT in multiturn chat...\n")
     for i, q in enumerate(questions):
         t0 = time.time()
         resp = client.chat.completions.create(
@@ -195,19 +271,26 @@ def prefix_caching_demo(model, inference_server_url):
             max_tokens=60, temperature=0.7,
             extra_body={"chat_template_kwargs": {"enable_thinking": False}},
         )
+        
+        metrics = get_vllm_metrics(inference_server_url)
+        ttft = metrics.get("vllm:time_to_first_token_seconds_sum", 0) / max(1, metrics.get("vllm:time_to_first_token_seconds_count", 1))
+        itl = metrics.get("vllm:inter_token_latency_seconds_sum", 0) / max(1, metrics.get("vllm:inter_token_latency_seconds_count", 1))
+        tl = metrics.get("vllm:e2e_request_latency_seconds_sum", 0) / max(1, metrics.get("vllm:e2e_request_latency_seconds_count", 1))
+        sys_throughput = (metrics.get("vllm:prompt_tokens_total", 0) + metrics.get("vllm:generation_tokens_total", 0)) / max(1, metrics.get("vllm:e2e_request_latency_seconds_sum", 1))
+        
         dt = time.time() - t0
         timings.append(dt)
         tok_counts.append(resp.usage.completion_tokens)
         tokens = resp.usage.completion_tokens
         ms_per_tok = (dt / tokens * 1000) if tokens > 0 else 0.0
-        print(f"  [{i+1}] {q:<35} {dt:.2f}s  ({tokens} tok, {ms_per_tok:.0f} ms/tok)")
+        print(f"  [{i+1}] {q:<35} {dt:.2f}s  ({tokens} tok, {ms_per_tok:.0f} ms/tok, TTFT: {ttft:.2f}s, ITL: {itl:.2f}s, Latency: {tl:.2f}s, Throughput: {sys_throughput:.1f} tok/s)")
         
     after = get_vllm_metrics(inference_server_url)
 
     prefix_before = before.get("vllm:prefix_cache_queries_total", 0)
     prefix_after = after.get("vllm:prefix_cache_queries_total", 0)
 
-    print(f"\nPrefix cache queries: {prefix_before:g} -> {prefix_after:g}  (+{prefix_after - prefix_before:g})")
+    print(f"\nPrefix cached queries: {prefix_before:g} -> {prefix_after:g}  (+{prefix_after - prefix_before:g})")
 
     cache_keys = [k for k in after if "prefix" in k.lower() or "cache_hit" in k.lower()]
     
@@ -221,7 +304,7 @@ def prefix_caching_demo(model, inference_server_url):
     hits_after = after.get("vllm:prefix_cache_hits_total", 0)
     hit_rate = (hits_after / prefix_after * 100) if prefix_after > 0 else 0.0
     
-    print(f"\nPrefix cache hit rate: {hit_rate:.1f}%")
-
-    print("\n The increasing prefix_cache_queries count confirms vLLM is ")
-    print("checking and reusing cached KV blocks for the shared system prompt.")
+    print(f"\nPrefix cache hit rate: {hit_rate:.1f}%\n")
+    
+    if (prefix_caching_enabled):
+        print(f"The increasing prefix_cache_queries count confirms vLLM is checking and reusing cached KV blocks for the shared system prompt.\n")

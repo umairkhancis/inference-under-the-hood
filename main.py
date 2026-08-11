@@ -1,6 +1,6 @@
 
 import time
-from inference_module import init_vllm, vllm_infer, demo_inference_performance, continuous_batching_demo
+from inference_module import init_vllm, vllm_infer, demo_inference_performance, continuous_batching_demo, prefix_caching_demo, debug_metrics
 
 if __name__ == "__main__":
     
@@ -15,11 +15,11 @@ if __name__ == "__main__":
     resp = vllm_infer(model, inference_server_url, prompt, max_tokens=50)
     elapsed = time.time() - start
     
-    # """ Step 2: Calculate Inference Service Level Indicators (SLIs). """
-    # demo_inference_performance(inference_server_url, prompt, resp)
+    """ Step 2: Calculate Inference Service Level Indicators (SLIs). """
+    demo_inference_performance(inference_server_url, prompt, resp)
     
-    """ Step 4: Continuous Batching Demo: Run concurrent inference requests. """
+    """ Step 3: Continuous Batching Demo: Run concurrent inference requests. """
     continuous_batching_demo(model, inference_server_url)
 
-    """ Step 5: Prefix Caching Demo: Run inference requests with a shared system prompt. """
-    # prefix_caching_demo(model, inference_server_url)
+    """ Step 4: Prefix Caching Demo: Run inference requests with a shared system prompt. """
+    prefix_caching_demo(model, inference_server_url)
